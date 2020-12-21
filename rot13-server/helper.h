@@ -53,7 +53,7 @@ int CreateListener(bool block_flag) {
   if (block_flag) {
     fcntl(listener, F_SETFL, O_NONBLOCK);
   }
-  if (bind(listener, (struct sockaddr *)&sin, sizeof(sin)) < 0) {
+  if (bind(listener, (struct sockaddr*)&sin, sizeof(sin)) < 0) {
     perror("bind");
     exit(EXIT_FAILURE);
   }
@@ -77,19 +77,19 @@ struct fd_state {
   bool writing;
 };
 
-struct fd_state *alloc_fd_state(void) {
-  struct fd_state *state = (struct fd_state *)malloc(sizeof(struct fd_state));
+struct fd_state* alloc_fd_state(void) {
+  struct fd_state* state = (struct fd_state*)malloc(sizeof(struct fd_state));
   if (!state) return NULL;
   state->buffer_used = state->n_written = state->write_upto = 0;
   state->writing = false;
   return state;
 }
 
-void free_fd_state(struct fd_state *state) { free(state); }
+void free_fd_state(struct fd_state* state) { free(state); }
 
 void make_nonblocking(int fd) { fcntl(fd, F_SETFL, O_NONBLOCK); }
 
-int do_read(int fd, struct fd_state *state) {
+int do_read(int fd, struct fd_state* state) {
   char buf[1024];
   int i;
   ssize_t result;
@@ -117,7 +117,7 @@ int do_read(int fd, struct fd_state *state) {
   return 0;
 }
 
-int do_write(int fd, struct fd_state *state) {
+int do_write(int fd, struct fd_state* state) {
   while (state->n_written < state->write_upto) {
     ssize_t result = send(fd, state->buffer + state->n_written,
                           state->write_upto - state->n_written, 0);

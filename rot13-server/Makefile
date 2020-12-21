@@ -1,4 +1,4 @@
-TARGETS=http_client multi-process-server multi-thread-server select-server epoll-server  low-libevent-server high-libevent-server
+TARGETS=http-client multi-process-server multi-thread-server select-server epoll-server  low-libevent-server high-libevent-server
 all: $(TARGETS)
 
 clean:
@@ -6,7 +6,7 @@ clean:
 
 .PHONY: all clean
 
-http_client: stage_0.cpp
+http-client: stage_0.cpp
 	g++ -g -Wall "$<" -o $@
 
 multi-process-server: stage_1.cpp

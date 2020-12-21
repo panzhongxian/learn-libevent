@@ -4,9 +4,9 @@
 
 #include "helper.h"
 
-void readcb(struct bufferevent *bev, void *ctx) {
+void readcb(struct bufferevent* bev, void* ctx) {
   struct evbuffer *input, *output;
-  char *line;
+  char* line;
   size_t n;
   input = bufferevent_get_input(bev);
   output = bufferevent_get_output(bev);
@@ -31,7 +31,7 @@ void readcb(struct bufferevent *bev, void *ctx) {
   }
 }
 
-void errorcb(struct bufferevent *bev, short error, void *ctx) {
+void errorcb(struct bufferevent* bev, short error, void* ctx) {
   if (error & BEV_EVENT_EOF) {
     /* connection has been closed, do any clean up here */
     /* ... */
@@ -45,17 +45,17 @@ void errorcb(struct bufferevent *bev, short error, void *ctx) {
   bufferevent_free(bev);
 }
 
-void do_accept(evutil_socket_t listener, short event, void *arg) {
-  struct event_base *base = (struct event_base *)arg;
+void do_accept(evutil_socket_t listener, short event, void* arg) {
+  struct event_base* base = (struct event_base*)arg;
   struct sockaddr_storage ss;
   socklen_t slen = sizeof(ss);
-  int fd = accept(listener, (struct sockaddr *)&ss, &slen);
+  int fd = accept(listener, (struct sockaddr*)&ss, &slen);
   if (fd < 0) {
     perror("accept");
   } else if (fd > FD_SETSIZE) {
     close(fd);
   } else {
-    struct bufferevent *bev;
+    struct bufferevent* bev;
     evutil_make_socket_nonblocking(fd);
     bev = bufferevent_socket_new(base, fd, BEV_OPT_CLOSE_ON_FREE);
     bufferevent_setcb(bev, readcb, NULL, errorcb, NULL);
@@ -65,22 +65,22 @@ void do_accept(evutil_socket_t listener, short event, void *arg) {
 }
 
 void run(void) {
-  struct event_base *base;
+  struct event_base* base;
 
   base = event_base_new();
   if (!base) return;
 
   evutil_socket_t listener = CreateListener(true);
 
-  struct event *listener_event =
-      event_new(base, listener, EV_READ | EV_PERSIST, do_accept, (void *)base);
+  struct event* listener_event =
+      event_new(base, listener, EV_READ | EV_PERSIST, do_accept, (void*)base);
   assert(listener_event);
   event_add(listener_event, NULL);
 
   event_base_dispatch(base);
 }
 
-int main(int c, char **v) {
+int main(int c, char** v) {
   setvbuf(stdout, NULL, _IONBF, 0);
 
   run();

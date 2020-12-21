@@ -2,15 +2,15 @@
 
 using namespace no_libevent;
 
-int main(int c, char **v) {
+int main(int c, char** v) {
   const char query[] =
       "GET / HTTP/1.0\r\n"
       "Host: www.google.com\r\n"
       "\r\n";
   const char hostname[] = "www.google.com";
   struct sockaddr_in sin;
-  struct hostent *h;
-  const char *cp;
+  struct hostent* h;
+  const char* cp;
   int fd;
   ssize_t n_written, remaining;
   char buf[1024];
@@ -37,8 +37,8 @@ int main(int c, char **v) {
   /* Connect to the remote host. */
   sin.sin_family = AF_INET;
   sin.sin_port = htons(80);
-  sin.sin_addr = *(struct in_addr *)h->h_addr;
-  if (connect(fd, (struct sockaddr *)&sin, sizeof(sin))) {
+  sin.sin_addr = *(struct in_addr*)h->h_addr;
+  if (connect(fd, (struct sockaddr*)&sin, sizeof(sin))) {
     perror("connect");
     close(fd);
     return 1;

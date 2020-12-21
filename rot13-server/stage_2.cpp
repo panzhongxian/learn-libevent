@@ -35,7 +35,7 @@ void child(int fd) {
   }
 }
 
-void *task(void *) {
+void* task(void*) {
   while (true) {
     if (accept_fd) {
       pthread_mutex_lock(&lock);
@@ -60,7 +60,7 @@ void run(void) {
   while (1) {
     struct sockaddr_storage ss;
     socklen_t slen = sizeof(ss);
-    accept_fd = accept(listener, (struct sockaddr *)&ss, &slen);
+    accept_fd = accept(listener, (struct sockaddr*)&ss, &slen);
     if (accept_fd < 0) {
       perror("accept");
       exit(EXIT_FAILURE);
@@ -75,7 +75,7 @@ void run(void) {
   }
 }
 
-int main(int c, char **v) {
+int main(int c, char** v) {
   run();
   return 0;
 }

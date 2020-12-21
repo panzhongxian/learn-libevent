@@ -3,7 +3,7 @@
 using namespace no_libevent;
 
 void run(void) {
-  struct fd_state *state[MAX_EVENTS];
+  struct fd_state* state[MAX_EVENTS];
   int epfd = epoll_create1(0);
   if (epfd == -1) {
     perror("epoll_create1");
@@ -34,7 +34,7 @@ void run(void) {
       if (events[i].data.fd == listener) {
         struct sockaddr_in addr;
         socklen_t addrlen;
-        int conn_sock = accept(listener, (struct sockaddr *)&addr, &addrlen);
+        int conn_sock = accept(listener, (struct sockaddr*)&addr, &addrlen);
         if (conn_sock == -1) {
           perror("accept");
           exit(EXIT_FAILURE);
@@ -69,7 +69,7 @@ void run(void) {
   }
 }
 
-int main(int c, char **v) {
+int main(int c, char** v) {
   setvbuf(stdout, NULL, _IONBF, 0);
 
   run();

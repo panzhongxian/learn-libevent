@@ -2,8 +2,8 @@
 
 #include "helper.h"
 
-void do_read(evutil_socket_t fd, short events, void *arg);
-void do_write(evutil_socket_t fd, short events, void *arg);
+void do_read(evutil_socket_t fd, short events, void* arg);
+void do_write(evutil_socket_t fd, short events, void* arg);
 
 struct fd_state {
   char buffer[MAX_LINE];
@@ -12,12 +12,12 @@ struct fd_state {
   size_t n_written;
   size_t write_upto;
 
-  struct event *read_event;
-  struct event *write_event;
+  struct event* read_event;
+  struct event* write_event;
 };
 
-struct fd_state *alloc_fd_state(struct event_base *base, evutil_socket_t fd) {
-  struct fd_state *state = (struct fd_state *)malloc(sizeof(struct fd_state));
+struct fd_state* alloc_fd_state(struct event_base* base, evutil_socket_t fd) {
+  struct fd_state* state = (struct fd_state*)malloc(sizeof(struct fd_state));
   if (!state) return NULL;
   state->read_event = event_new(base, fd, EV_READ | EV_PERSIST, do_read, state);
   if (!state->read_event) {
@@ -39,14 +39,14 @@ struct fd_state *alloc_fd_state(struct event_base *base, evutil_socket_t fd) {
   return state;
 }
 
-void free_fd_state(struct fd_state *state) {
+void free_fd_state(struct fd_state* state) {
   event_free(state->read_event);
   event_free(state->write_event);
   free(state);
 }
 
-void do_read(evutil_socket_t fd, short events, void *arg) {
-  struct fd_state *state = (struct fd_state *)arg;
+void do_read(evutil_socket_t fd, short events, void* arg) {
+  struct fd_state* state = (struct fd_state*)arg;
   char buf[1024];
   int i;
   ssize_t result;
@@ -76,8 +76,8 @@ void do_read(evutil_socket_t fd, short events, void *arg) {
   }
 }
 
-void do_write(evutil_socket_t fd, short events, void *arg) {
-  struct fd_state *state = (struct fd_state *)arg;
+void do_write(evutil_socket_t fd, short events, void* arg) {
+  struct fd_state* state = (struct fd_state*)arg;
 
   while (state->n_written < state->write_upto) {
     ssize_t result = send(fd, state->buffer + state->n_written,
@@ -99,17 +99,17 @@ void do_write(evutil_socket_t fd, short events, void *arg) {
   event_del(state->write_event);
 }
 
-void do_accept(evutil_socket_t listener, short event, void *arg) {
-  struct event_base *base = (struct event_base *)arg;
+void do_accept(evutil_socket_t listener, short event, void* arg) {
+  struct event_base* base = (struct event_base*)arg;
   struct sockaddr_storage ss;
   socklen_t slen = sizeof(ss);
-  int fd = accept(listener, (struct sockaddr *)&ss, &slen);
+  int fd = accept(listener, (struct sockaddr*)&ss, &slen);
   if (fd < 0) {  // XXXX eagain??
     perror("accept");
   } else if (fd > FD_SETSIZE) {
     close(fd);  // XXX replace all closes with EVUTIL_CLOSESOCKET */
   } else {
-    struct fd_state *state;
+    struct fd_state* state;
     evutil_make_socket_nonblocking(fd);
     state = alloc_fd_state(base, fd);
     assert(state); /*XXX err*/
@@ -119,15 +119,15 @@ void do_accept(evutil_socket_t listener, short event, void *arg) {
 }
 
 void run(void) {
-  struct event_base *base;
+  struct event_base* base;
 
   base = event_base_new();
   if (!base) return; /*XXXerr*/
 
   evutil_socket_t listener = CreateListener(true);
 
-  struct event *listener_event =
-      event_new(base, listener, EV_READ | EV_PERSIST, do_accept, (void *)base);
+  struct event* listener_event =
+      event_new(base, listener, EV_READ | EV_PERSIST, do_accept, (void*)base);
 
   assert(listener_event);
   event_add(listener_event, NULL);
@@ -135,7 +135,7 @@ void run(void) {
   event_base_dispatch(base);
 }
 
-int main(int c, char **v) {
+int main(int c, char** v) {
   setvbuf(stdout, NULL, _IONBF, 0);
 
   run();

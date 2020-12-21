@@ -3,7 +3,7 @@
 using namespace no_libevent;
 
 void run(void) {
-  struct fd_state *state[FD_SETSIZE];
+  struct fd_state* state[FD_SETSIZE];
   int i, maxfd;
   fd_set readset, writeset, exset;
 
@@ -42,7 +42,7 @@ void run(void) {
     if (FD_ISSET(listener, &readset)) {
       struct sockaddr_storage ss;
       socklen_t slen = sizeof(ss);
-      int fd = accept(listener, (struct sockaddr *)&ss, &slen);
+      int fd = accept(listener, (struct sockaddr*)&ss, &slen);
       if (fd < 0) {
         perror("accept");
       } else if (fd > FD_SETSIZE) {
@@ -73,7 +73,7 @@ void run(void) {
   }
 }
 
-int main(int c, char **v) {
+int main(int c, char** v) {
   setvbuf(stdout, NULL, _IONBF, 0);
 
   run();

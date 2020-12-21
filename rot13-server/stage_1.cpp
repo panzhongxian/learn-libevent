@@ -35,7 +35,7 @@ void run(void) {
   while (1) {
     struct sockaddr_storage ss;
     socklen_t slen = sizeof(ss);
-    int fd = accept(listener, (struct sockaddr *)&ss, &slen);
+    int fd = accept(listener, (struct sockaddr*)&ss, &slen);
     if (fd < 0) {
       perror("accept");
     } else {
@@ -47,7 +47,7 @@ void run(void) {
   }
 }
 
-int main(int c, char **v) {
+int main(int c, char** v) {
   run();
   return 0;
 }
