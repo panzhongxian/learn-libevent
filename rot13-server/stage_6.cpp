@@ -65,29 +65,12 @@ void do_accept(evutil_socket_t listener, short event, void *arg) {
 }
 
 void run(void) {
-  evutil_socket_t listener;
-  struct sockaddr_in sin;
   struct event_base *base;
 
   base = event_base_new();
   if (!base) return;
 
-  sin.sin_family = AF_INET;
-  sin.sin_addr.s_addr = 0;
-  sin.sin_port = htons(LISTENING_PORT);
-
-  listener = socket(AF_INET, SOCK_STREAM, 0);
-  evutil_make_socket_nonblocking(listener);
-
-  if (bind(listener, (struct sockaddr *)&sin, sizeof(sin)) < 0) {
-    perror("bind");
-    return;
-  }
-
-  if (listen(listener, 16) < 0) {
-    perror("listen");
-    return;
-  }
+  evutil_socket_t listener = CreateListener(true);
 
   struct event *listener_event =
       event_new(base, listener, EV_READ | EV_PERSIST, do_accept, (void *)base);

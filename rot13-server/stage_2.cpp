@@ -51,24 +51,7 @@ void *task(void *) {
   return nullptr;
 }
 void run(void) {
-  int listener;
-  struct sockaddr_in sin;
-
-  sin.sin_family = AF_INET;
-  sin.sin_addr.s_addr = 0;
-  sin.sin_port = htons(LISTENING_PORT);
-
-  listener = socket(AF_INET, SOCK_STREAM, 0);
-
-  if (bind(listener, (struct sockaddr *)&sin, sizeof(sin)) < 0) {
-    perror("bind");
-    return;
-  }
-
-  if (listen(listener, 16) < 0) {
-    perror("listen");
-    return;
-  }
+  int listener = CreateListener();
 
   for (int i = 0; i < MAX_EVENTS; ++i) {
     pthread_create(&thread_array[i], NULL, task, NULL);

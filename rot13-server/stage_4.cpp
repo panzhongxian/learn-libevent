@@ -10,25 +10,9 @@ void run(void) {
     exit(EXIT_FAILURE);
   }
 
-  struct sockaddr_in sin;
-  sin.sin_family = AF_INET;
-  sin.sin_addr.s_addr = 0;
-  sin.sin_port = htons(LISTENING_PORT);
-
   for (int i = 0; i < MAX_EVENTS; ++i) state[i] = NULL;
 
-  int listener = socket(AF_INET, SOCK_STREAM, 0);
-  make_nonblocking(listener);
-
-  if (bind(listener, (struct sockaddr *)&sin, sizeof(sin)) < 0) {
-    perror("bind");
-    return;
-  }
-
-  if (listen(listener, 16) < 0) {
-    perror("listen");
-    return;
-  }
+  int listener = CreateListener(true);
 
   struct epoll_event ev;
   ev.events = EPOLLIN;

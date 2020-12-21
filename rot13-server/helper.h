@@ -40,6 +40,31 @@ char rot13_char(char c) {
     return c;
 }
 
+int CreateListener(bool block_flag = false);
+
+int CreateListener(bool block_flag) {
+  struct sockaddr_in sin;
+
+  sin.sin_family = AF_INET;
+  sin.sin_addr.s_addr = 0;
+  sin.sin_port = htons(LISTENING_PORT);
+
+  int listener = socket(AF_INET, SOCK_STREAM, 0);
+  if (block_flag) {
+    fcntl(listener, F_SETFL, O_NONBLOCK);
+  }
+  if (bind(listener, (struct sockaddr *)&sin, sizeof(sin)) < 0) {
+    perror("bind");
+    exit(EXIT_FAILURE);
+  }
+
+  if (listen(listener, 16) < 0) {
+    perror("listen");
+    exit(EXIT_FAILURE);
+  }
+  return listener;
+}
+
 namespace no_libevent {
 
 struct fd_state {

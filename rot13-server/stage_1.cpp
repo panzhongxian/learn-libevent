@@ -31,25 +31,7 @@ void child(int fd) {
 }
 
 void run(void) {
-  int listener;
-  struct sockaddr_in sin;
-
-  sin.sin_family = AF_INET;
-  sin.sin_addr.s_addr = 0;
-  sin.sin_port = htons(LISTENING_PORT);
-
-  listener = socket(AF_INET, SOCK_STREAM, 0);
-
-  if (bind(listener, (struct sockaddr *)&sin, sizeof(sin)) < 0) {
-    perror("bind");
-    return;
-  }
-
-  if (listen(listener, 16) < 0) {
-    perror("listen");
-    return;
-  }
-
+  int listener = CreateListener();
   while (1) {
     struct sockaddr_storage ss;
     socklen_t slen = sizeof(ss);

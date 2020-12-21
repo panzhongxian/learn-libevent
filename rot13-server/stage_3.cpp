@@ -3,30 +3,13 @@
 using namespace no_libevent;
 
 void run(void) {
-  int listener;
   struct fd_state *state[FD_SETSIZE];
-  struct sockaddr_in sin;
   int i, maxfd;
   fd_set readset, writeset, exset;
 
-  sin.sin_family = AF_INET;
-  sin.sin_addr.s_addr = 0;
-  sin.sin_port = htons(LISTENING_PORT);
-
   for (i = 0; i < FD_SETSIZE; ++i) state[i] = NULL;
 
-  listener = socket(AF_INET, SOCK_STREAM, 0);
-  make_nonblocking(listener);
-
-  if (bind(listener, (struct sockaddr *)&sin, sizeof(sin)) < 0) {
-    perror("bind");
-    return;
-  }
-
-  if (listen(listener, 16) < 0) {
-    perror("listen");
-    return;
-  }
+  int listener = CreateListener(true);
 
   FD_ZERO(&readset);
   FD_ZERO(&writeset);
