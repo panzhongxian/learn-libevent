@@ -10,7 +10,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-constexpr int kMaxClientNum = 4000;
+#include "utility.h"
 
 void OnWrite(evutil_socket_t fd, short what, void* arg);
 void OnRead(evutil_socket_t fd, short what, void* arg);
@@ -18,9 +18,8 @@ void OnRead(evutil_socket_t fd, short what, void* arg);
 void OnWrite(evutil_socket_t fd, short what, void* arg) {
   struct event* write_event = (struct event*)arg;
   if (what & EV_WRITE) {
-    char req[] = {"GET / HTTP/1.1\r\nHost: www.baidu.com\r\n\r\n"};
-    int ret = write(fd, req, sizeof(req));
-    if (ret < strlen(req)) {
+    int ret = write(fd, kDemoHttpRequestStr, sizeof(kDemoHttpRequestStr));
+    if (ret < strlen(kDemoHttpRequestStr)) {
       event_del((struct event*)arg);
       return;
     }
@@ -101,16 +100,16 @@ void OnConnect(evutil_socket_t fd, short what, void* arg) {
   }
 }
 
-void CreateConections() {
+void Run() {
   struct event_base* base = event_base_new();
   struct timeval five_sec = {5, 0};
 
-  for (int i = 0; i < kMaxClientNum; i++) {
+  for (int i = 0; i < kMaxHttpClientNum; i++) {
     int fd = socket(AF_INET, SOCK_STREAM, 0);
     fcntl(fd, F_SETFL, O_NONBLOCK);
     struct sockaddr_in sin;
     sin.sin_family = AF_INET;
-    sin.sin_addr.s_addr = inet_addr("14.215.177.39");
+    sin.sin_addr.s_addr = inet_addr(kDemoHttpServerIp);
     sin.sin_port = htons(80);
     if (connect(fd, (struct sockaddr*)&sin, sizeof(sin)) < 0) {
       if (errno != EINPROGRESS) {
@@ -128,6 +127,6 @@ void CreateConections() {
 }
 
 int main() {
-  CreateConections();
+  Run();
   return 0;
 }

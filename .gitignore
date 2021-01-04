@@ -1,3 +1,5 @@
 a.out
 .vscode
 bazel-*
+*.log
+core.*

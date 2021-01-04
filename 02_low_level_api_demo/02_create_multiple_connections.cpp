@@ -10,7 +10,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-constexpr int kMaxClientNum = 1000;
+#include "utility.h"
 
 void OnConnect(evutil_socket_t fd, short what, void* arg) {
   assert(arg);
@@ -48,19 +48,18 @@ void CreateConections() {
   struct event_base* base = event_base_new();
   struct timeval five_sec = {5, 0};
 
-  for (int i = 0; i < kMaxClientNum; i++) {
+  for (int i = 0; i < kMaxHttpClientNum; i++) {
     int fd = socket(AF_INET, SOCK_STREAM, 0);
     fcntl(fd, F_SETFL, O_NONBLOCK);
     struct sockaddr_in sin;
     sin.sin_family = AF_INET;
-    sin.sin_addr.s_addr = inet_addr("14.215.177.39");
+    sin.sin_addr.s_addr = inet_addr(kDemoHttpServerIp);
     sin.sin_port = htons(80);
-    if (connect(fd, (struct sockaddr*)&sin, sizeof(sin)) < 0) {
-      if (errno != EINPROGRESS) {
-        perror("connect failed");
-        event_base_loopbreak(base);
-        return;
-      }
+    if (connect(fd, (struct sockaddr*)&sin, sizeof(sin)) < 0 &&
+        errno != EINPROGRESS) {
+      perror("connect failed");
+      event_base_loopbreak(base);
+      return;
     }
     struct event* e = event_new(base, fd, EV_WRITE | EV_TIMEOUT, OnConnect,
                                 event_self_cbarg());
