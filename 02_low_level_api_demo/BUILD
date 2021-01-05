@@ -7,7 +7,10 @@ cc_binary(
 cc_binary(
     name = "02_create_multiple_connections",
     srcs = ["02_create_multiple_connections.cpp"],
-    deps = ["//:libevent"],
+    deps = [
+        ":utility",
+        "//:libevent",
+    ],
 )
 
 cc_binary(

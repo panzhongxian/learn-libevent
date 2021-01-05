@@ -1,6 +1,6 @@
 ## Stage 1: Timing event, period event and signal event
 
-There are 3 tasks:
+There are 3 events:
 
 1. PeriodTask: print one line per second for five times.
 2. TimingTask: send `SIGUSR1` signal to the process self.

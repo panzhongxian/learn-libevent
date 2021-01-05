@@ -122,7 +122,12 @@ void Run() {
                                 event_self_cbarg());
     event_add(e, &five_sec);
   }
+  timeval t1;
+  gettimeofday(&t1, NULL);
+  fprintf(stderr, "time: %d.%06d\n", t1.tv_sec, t1.tv_usec);
   event_base_dispatch(base);
+  gettimeofday(&t1, NULL);
+  fprintf(stderr, "time: %d.%06d\n", t1.tv_sec, t1.tv_usec);
   return;
 }
 

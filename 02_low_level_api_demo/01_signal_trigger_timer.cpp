@@ -17,6 +17,7 @@ void TimingTask(evutil_socket_t fd, short what, void* arg) {
   struct event* me = (struct event*)arg;
   kill(getpid(), 10);
   evtimer_del(me);
+  printf("set signal SIGUSR1\n");
   // event_base_loopbreak(event_get_base(me));
 }
 
