@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -19,16 +20,17 @@ void OnWrite(evutil_socket_t fd, short what, void* arg) {
   struct event* write_event = (struct event*)arg;
   if (what & EV_WRITE) {
     int ret = write(fd, kDemoHttpRequestStr, sizeof(kDemoHttpRequestStr));
-    if (ret < strlen(kDemoHttpRequestStr)) {
+    if (ret < (int)strlen(kDemoHttpRequestStr)) {
+      printf("write ret non-zero value: %d\n", ret);
       event_del((struct event*)arg);
       return;
     }
-    printf("writing...\n");
+    printf("writing...ret: %d\n", ret);
   }
 
   if (what & EV_TIMEOUT) {
     event_del((struct event*)arg);
-    printf("timeout.\n");
+    printf("write timeout.\n");
     return;
   }
 
@@ -43,21 +45,26 @@ void OnWrite(evutil_socket_t fd, short what, void* arg) {
 void OnRead(evutil_socket_t fd, short what, void* arg) {
   if (what & EV_READ) {
     char buff[1024];
-    int n = read(fd, buff, sizeof(buff));
     printf("reading...\n");
-    while (n > 0) {
+    while (true) {
+      int n = read(fd, buff, sizeof(buff));
       printf("%.*s", n, buff);
-      n = read(fd, buff, sizeof(buff));
-    }
-    if (n == 0) {
-      close(fd);
-    }
-    if (n < 0) {
-      perror("read() error:");
+      if (n == 0) {
+        close(fd);
+        event_del((struct event*)arg);
+        return;
+      }
+      if (n < 0) {
+        // FIXME: if (errno == EAGAIN || errno == EWOULDBLOCK)
+        perror("read() error:");
+        close(fd);
+        event_del((struct event*)arg);
+        return;
+      }
     }
   }
   if (what & EV_TIMEOUT) {
-    printf("timeout.\n");
+    printf("read timeout.\n");
     event_del((struct event*)arg);
     return;
   }
@@ -94,10 +101,11 @@ void OnConnect(evutil_socket_t fd, short what, void* arg) {
   }
 
   if (what & EV_TIMEOUT) {
-    printf("timeout.\n");
+    printf("connect timeout.\n");
     event_del((struct event*)arg);
     return;
   }
+  abort();
 }
 
 void Run() {
@@ -110,7 +118,7 @@ void Run() {
     struct sockaddr_in sin;
     sin.sin_family = AF_INET;
     sin.sin_addr.s_addr = inet_addr(kDemoHttpServerIp);
-    sin.sin_port = htons(80);
+    sin.sin_port = htons(kDemoHttpServerPort);
     if (connect(fd, (struct sockaddr*)&sin, sizeof(sin)) < 0) {
       if (errno != EINPROGRESS) {
         perror("connect failed");
@@ -122,12 +130,12 @@ void Run() {
                                 event_self_cbarg());
     event_add(e, &five_sec);
   }
-  timeval t1;
-  gettimeofday(&t1, NULL);
-  fprintf(stderr, "time: %d.%06d\n", t1.tv_sec, t1.tv_usec);
+  timeval t;
+  gettimeofday(&t, NULL);
+  fprintf(stderr, "start time: %ld.%06ld\n", t.tv_sec, t.tv_usec);
   event_base_dispatch(base);
-  gettimeofday(&t1, NULL);
-  fprintf(stderr, "time: %d.%06d\n", t1.tv_sec, t1.tv_usec);
+  gettimeofday(&t, NULL);
+  fprintf(stderr, "end time: %ld.%06ld\n", t.tv_sec, t.tv_usec);
   return;
 }
 
